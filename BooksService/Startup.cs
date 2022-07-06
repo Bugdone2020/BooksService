@@ -1,19 +1,18 @@
-using BooksService.MapperProfiles;
+using BooksDataAccesLayer;
+using BooksDataAccesLayer.Interfaces;
+using BooksDataAccesLayer.Repositories;
+using BooksBuisnessLayer.Interfaces;
+using BooksBuisnessLayer.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using BooksBuisnessLayer.MapperProfiles;
 
-namespace BooksService
+namespace BooksPresentationLayer
 {
     public class Startup
     {
@@ -27,8 +26,10 @@ namespace BooksService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddScoped<BooksService>();
-            //services.AddScoped<IBookRepository, BookInListRepository>();
+            services.AddScoped<IBooksRepository, BooksRepository>();
+            services.AddScoped<IBooksService, BooksService>();
+            services.AddDbContext<EFCoreDbContext>(options =>
+            options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
             var assemblies = new[]
             {
                 Assembly.GetAssembly(typeof(BooksProfile))

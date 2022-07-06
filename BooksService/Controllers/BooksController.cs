@@ -1,97 +1,81 @@
 ﻿using AutoMapper;
-using BooksService.DTOs;
-using BooksService.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using BooksDataAccesLayer.Models;
+using BooksBuisnessLayer.Interfaces;
+using BooksBuisnessLayer.DTOs;
 
-namespace BooksService.Controllers
+namespace BooksPresentationLayer.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class BooksController : ControllerBase
     {
-        static List<Book> Books;
-        private IMapper _mapper;
         private readonly ILogger<Book> _logger;
-        static BooksController()
+        private readonly IBooksService _booksService;
+        
+        public BooksController(IBooksService booksService, ILogger<Book> logger, IMapper mapper)
         {
-            Books = new List<Book>();
-            Books.Add(new Book
-            {
-                Id = Guid.NewGuid(),
-                Name = "CLR via C#",
-                Autor = "Jeffrey Richter",
-                Publisher = " Microsoft Press",
-                Age = 2012,
-                Pages = 896,
-                Genre = Genre.Science
-            });
-        }
-        public BooksController(ILogger<Book> logger, IMapper mapper)
-        {
+            _booksService = booksService;
             _logger = logger;
-            _mapper = mapper;
         }
 
         [HttpPost]
-        public IActionResult Create(BookDTO bookDTO)
+        public IActionResult CreateBook(BookDTO bookDTO)
         {
-            Book book = _mapper.Map<Book>(bookDTO);
-            book.Id = Guid.NewGuid();
-            if (book.Id != Guid.Empty)
+            Guid guid = _booksService.CreateBook(bookDTO);
+            if (guid != Guid.Empty)
             {
-                Books.Add(book);
-                return Ok(book.Id);
+                return Ok(guid);
             }
-            return BadRequest();
 
+            return BadRequest();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, BookDTO bookDTO)
+        public IActionResult UpdateBook(Guid id, BookDTO bookDTO)
         {
-            Book updatedBook = _mapper.Map<Book>(bookDTO);
-            updatedBook.Id = id;
-            Book book = Books.FirstOrDefault(x => x.Id == id);
-            if (book != null)
+            Book updatedBook = _booksService.UpdateBook(id, bookDTO);
+            
+            if (updatedBook != null)
             {
-                var index = Books.IndexOf(book);
-                Books[index] = updatedBook;
                 return Ok(updatedBook);
             }
+
             return BadRequest();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteById(Guid id)
+        public IActionResult DeleteBookById(Guid id)
         {
-            Book book = Books.FirstOrDefault(x => x.Id == id);
+            Book book = _booksService.DeleteBookById(id);
             if (book != null)
             {
-                Books.Remove(book);
                 return Ok(book);
             }
+
             return NotFound();
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAllBooks()
         {
-            return Ok(Books);
+            IEnumerable<Book> books = _booksService.GetAllBooks();
+            
+            return Ok(books);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
+        public IActionResult GetBookById(Guid id)
         {
-            Book book = Books.FirstOrDefault(x => x.Id == id);
+            Book book = _booksService.GetBookById(id);
             if (book != null)
             {
                 return Ok(book);
             }
+
             return NotFound();
         }
     }

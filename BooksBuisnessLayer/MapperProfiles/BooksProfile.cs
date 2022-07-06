@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using BooksService.DTOs;
-using BooksService.Models;
+using BooksBuisnessLayer.DTOs;
+using BooksDataAccesLayer.Models;
 using System;
-namespace BooksService.MapperProfiles
+namespace BooksBuisnessLayer.MapperProfiles
 {
     public class BooksProfile : Profile
     {
