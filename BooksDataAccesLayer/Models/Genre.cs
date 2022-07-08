@@ -1,4 +1,4 @@
-﻿namespace BooksService.Models
+﻿namespace BooksDataAccesLayer.Models
 {
     public enum Genre
     {

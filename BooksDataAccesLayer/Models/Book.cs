@@ -1,6 +1,7 @@
 using System;
+using System.Text.Json.Serialization;
 
-namespace BooksService.Models
+namespace BooksDataAccesLayer.Models
 {
     public class Book
     {
