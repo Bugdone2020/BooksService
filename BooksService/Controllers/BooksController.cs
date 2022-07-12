@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using BooksDataAccesLayer.Models;
 using BooksBuisnessLayer.Interfaces;
 using BooksBuisnessLayer.DTOs;
+using System.Threading.Tasks;
 
 namespace BooksPresentationLayer.Controllers
 {
@@ -23,9 +24,9 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateBook(BookDTO bookDTO)
+        public async Task<IActionResult> CreateBook(BookDTO bookDTO)
         {
-            Guid guid = _booksService.CreateBook(bookDTO);
+            Guid guid = await _booksService.CreateBook(bookDTO);
             if (guid != Guid.Empty)
             {
                 return Ok(guid);
@@ -35,9 +36,9 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<IActionResult> UpdateBook(Guid id, BookDTO bookDTO)
         {
-            Book updatedBook = _booksService.UpdateBook(id, bookDTO);
+            Book updatedBook = await _booksService.UpdateBook(id, bookDTO);
             
             if (updatedBook != null)
             {
@@ -48,9 +49,9 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBookById(Guid id)
+        public async Task<IActionResult> DeleteBookById(Guid id)
         {
-            Book book = _booksService.DeleteBookById(id);
+            Book book = await _booksService.DeleteBookById(id);
             if (book != null)
             {
                 return Ok(book);
@@ -60,17 +61,17 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
-            IEnumerable<Book> books = _booksService.GetAllBooks();
+            IEnumerable<Book> books = await _booksService.GetAllBooks();
             
             return Ok(books);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetBookById(Guid id)
+        public async Task<IActionResult> GetBookById(Guid id)
         {
-            Book book = _booksService.GetBookById(id);
+            Book book = await _booksService.GetBookById(id);
             if (book != null)
             {
                 return Ok(book);

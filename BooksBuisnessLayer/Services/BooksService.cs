@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using BooksDataAccesLayer.Interfaces;
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace BooksBuisnessLayer.Services
 {
@@ -19,38 +20,47 @@ namespace BooksBuisnessLayer.Services
             _mapper = mapper;
         }
 
-        Guid IBooksService.CreateBook(BookDTO bookDTO)
+        public async Task<Guid> CreateBook(BookDTO bookDTO)
         {
             Book book = _mapper.Map<Book>(bookDTO);
-
-            return _booksRepository.Create(book);
+            ValidateBookState(book);
+            return await _booksRepository.Create(book);
         }
 
-        Book IBooksService.DeleteBookById(Guid id)
+        public async Task<Book> DeleteBookById(Guid id)
         {
-            return _booksRepository.DeleteById(id);
+            return await _booksRepository.DeleteById(id);
         }
 
-        IEnumerable<Book> IBooksService.GetAllBooks()
+        public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            return _booksRepository.GetAll();
+            return await _booksRepository.GetAll();
         }
 
-        Book IBooksService.GetBookById(Guid id)
+        public async Task<Book> GetBookById(Guid id)
         {
-            return _booksRepository.GetById(id);
+            return await _booksRepository.GetById(id);
         }
 
-        Book IBooksService.UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<Book> UpdateBook(Guid id, BookDTO bookDTO)
         {
             Book book = _mapper.Map<Book>(bookDTO);
             if (book != null)
             {
+                ValidateBookState(book);
                 book.Id = id;
-                return _booksRepository.Update(book);
+                return await _booksRepository.Update(book);
             }
 
             return null;
+        }
+
+        private static void ValidateBookState(Book book)
+        {
+            if (book.Pages < 10 || book.Pages > 2_000)
+            {
+                throw new ArgumentException("Invalid pages count!");
+            }
         }
     }
 }
