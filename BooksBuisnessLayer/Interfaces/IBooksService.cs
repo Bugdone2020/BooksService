@@ -8,10 +8,11 @@ namespace BooksBuisnessLayer.Interfaces
 {
     public interface IBooksService
     {
-        Task<Guid> CreateBook(BookDTO bookDTO);
+        Task<Guid> CreateBook(Book book);
         Task<Book> DeleteBookById(Guid id);
         Task<IEnumerable<Book>> GetAllBooks();
         Task<Book> GetBookById(Guid id);
-        Task<Book> UpdateBook(Guid id, BookDTO bookDTO);
+        Task<BookDTO> GetBookFullInfo(Guid id);
+        Task<Book> UpdateBook(Book book);
     }
 }

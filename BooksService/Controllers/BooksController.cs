@@ -24,9 +24,9 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateBook(BookDTO bookDTO)
+        public async Task<IActionResult> CreateBook(Book book)
         {
-            Guid guid = await _booksService.CreateBook(bookDTO);
+            Guid guid = await _booksService.CreateBook(book);
             if (guid != Guid.Empty)
             {
                 return Ok(guid);
@@ -36,9 +36,10 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<IActionResult> UpdateBook(Guid id, Book book)
         {
-            Book updatedBook = await _booksService.UpdateBook(id, bookDTO);
+            book.Id = id;
+            Book updatedBook = await _booksService.UpdateBook(book);
             
             if (updatedBook != null)
             {
@@ -60,6 +61,7 @@ namespace BooksPresentationLayer.Controllers
             return NotFound();
         }
 
+        //[Authorize(Roles = Roles.Reader)]
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
         {
@@ -72,6 +74,19 @@ namespace BooksPresentationLayer.Controllers
         public async Task<IActionResult> GetBookById(Guid id)
         {
             Book book = await _booksService.GetBookById(id);
+            if (book != null)
+            {
+                return Ok(book);
+            }
+
+            return NotFound();
+        }
+
+        [HttpGet("full/{id}")]
+        public async Task<IActionResult> GetFullBookInfoById(Guid id)
+        {
+            //return await _booksService.GetBookFullInfo(id);
+            BookDTO book = await _booksService.GetBookFullInfo(id);
             if (book != null)
             {
                 return Ok(book);

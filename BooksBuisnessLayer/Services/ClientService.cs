@@ -10,12 +10,12 @@ namespace BooksBuisnessLayer.Services
 {
     public class ClientService : IClientService
     {
-        public bool RentABook(Book book, Client client)
+        public bool RentABook(Book book, User user)
         {
             throw new NotImplementedException();
         }
 
-        public bool ReturnABook(Book book, Client client)
+        public bool ReturnABook(Book book, User user)
         {
             throw new NotImplementedException();
         }

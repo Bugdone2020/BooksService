@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace BooksBuisnessLayer.Interfaces
 {
-    internal interface IClientService
+    public interface IClientService
     {
-        bool RentABook(Book book, Client client);
-        bool ReturnABook(Book book, Client client);
+        bool RentABook(Book book, User user);
+        bool ReturnABook(Book book, User user);
     }
 }

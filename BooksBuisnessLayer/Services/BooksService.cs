@@ -6,61 +6,76 @@ using System.Collections.Generic;
 using BooksDataAccesLayer.Interfaces;
 using AutoMapper;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace BooksBuisnessLayer.Services
 {
     public class BooksService : IBooksService
     {
+        private readonly IGenericRepository<Book> _genericBooksRepository;
         public readonly IBooksRepository _booksRepository;
         private readonly IMapper _mapper;
 
-        public BooksService(IBooksRepository booksRepository, IMapper mapper)
+        public BooksService(IGenericRepository<Book> genericBooksRepository,
+            IBooksRepository booksRepository, 
+            IMapper mapper)
         {
+            _genericBooksRepository = genericBooksRepository;
             _booksRepository = booksRepository;
             _mapper = mapper;
         }
 
-        public async Task<Guid> CreateBook(BookDTO bookDTO)
+        public async Task<Guid> CreateBook(Book book)
         {
-            Book book = _mapper.Map<Book>(bookDTO);
-            ValidateBookState(book);
-            return await _booksRepository.Create(book);
+            return await _genericBooksRepository.Create(book);
         }
 
         public async Task<Book> DeleteBookById(Guid id)
         {
-            return await _booksRepository.DeleteById(id);
+            return await _genericBooksRepository.DeleteById(id);
         }
 
         public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            return await _booksRepository.GetAll();
+            return await _genericBooksRepository.GetAll();
         }
 
         public async Task<Book> GetBookById(Guid id)
         {
-            return await _booksRepository.GetById(id);
+            return await _genericBooksRepository.GetById(id);
         }
 
-        public async Task<Book> UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<Book> UpdateBook(Book book)
         {
-            Book book = _mapper.Map<Book>(bookDTO);
-            if (book != null)
-            {
-                ValidateBookState(book);
-                book.Id = id;
-                return await _booksRepository.Update(book);
-            }
-
-            return null;
+            return await _genericBooksRepository.Update(book);
         }
 
-        private static void ValidateBookState(Book book)
+        public async Task<BookDTO> GetBookFullInfo(Guid id)
         {
-            if (book.Pages < 10 || book.Pages > 2_000)
+            var result = await _booksRepository.GetFullInfo(id);
+
+            return MapTupleToBookDto(result);
+        }
+
+        private BookDTO MapTupleToBookDto((Book book, IEnumerable<BookRevision> bookRevisions) result)
+        {
+            return new BookDTO
             {
-                throw new ArgumentException("Invalid pages count!");
-            }
+                Author = result.book?.Author,
+                BookId = result.book.Id,
+                Title = result.book.Title,
+                BookRevisions = MapRevisions(result.bookRevisions)
+            };
+        }
+
+        private IEnumerable<BookRevisionDto> MapRevisions(IEnumerable<BookRevision> bookRevisions)
+        {
+            return bookRevisions.Select(x => new BookRevisionDto
+            {
+                Price = x.Price,
+                PagesCount = x.PagesCount,
+                YearOfPublishing = x.YearOfPublishing
+            });
         }
     }
 }
