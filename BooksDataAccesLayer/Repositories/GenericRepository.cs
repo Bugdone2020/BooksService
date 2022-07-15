@@ -29,16 +29,12 @@ namespace BooksDataAccesLayer.Repositories
             return item.Id;
         }
 
-        public async Task<T> DeleteById(Guid id)
+        public async Task<bool> DeleteById(Guid id)
         {
-            var item = await GetById(id);
-            if (item != null)
-            {
-                _dbSet.Remove(item);
-                await _dbContext.SaveChangesAsync();
-            }
-
-            return item;
+            var item = new T { Id = id};
+            _dbContext.Entry(item).State = EntityState.Detached;
+            
+            return await _dbContext.SaveChangesAsync() != 0;
         }
 
         public async Task<IEnumerable<T>> GetAll()
@@ -56,13 +52,11 @@ namespace BooksDataAccesLayer.Repositories
             return await _dbSet.Where(predicate).FirstOrDefaultAsync();
         }
 
-        public async Task<T> Update(T item)
+        public async Task<bool> Update(T item)
         {
-            _dbSet.Attach(item);
             _dbContext.Entry(item).State = EntityState.Modified;
-            await _dbContext.SaveChangesAsync();
 
-            return item;
+            return await _dbContext.SaveChangesAsync() != 0;
         }
     }
 }

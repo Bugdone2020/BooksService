@@ -39,26 +39,17 @@ namespace BooksPresentationLayer.Controllers
         public async Task<IActionResult> UpdateBook(Guid id, Book book)
         {
             book.Id = id;
-            Book updatedBook = await _booksService.UpdateBook(book);
-            
-            if (updatedBook != null)
-            {
-                return Ok(updatedBook);
-            }
+            var result = await _booksService.UpdateBook(book);
 
-            return BadRequest();
+            return result ? StatusCode(200) : StatusCode(400);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBookById(Guid id)
         {
-            Book book = await _booksService.DeleteBookById(id);
-            if (book != null)
-            {
-                return Ok(book);
-            }
+            var result = await _booksService.DeleteBookById(id);
 
-            return NotFound();
+            return result ? StatusCode(200) : StatusCode(400);
         }
 
         //[Authorize(Roles = Roles.Reader)]
@@ -85,7 +76,6 @@ namespace BooksPresentationLayer.Controllers
         [HttpGet("full/{id}")]
         public async Task<IActionResult> GetFullBookInfoById(Guid id)
         {
-            //return await _booksService.GetBookFullInfo(id);
             BookDTO book = await _booksService.GetBookFullInfo(id);
             if (book != null)
             {

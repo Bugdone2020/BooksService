@@ -15,11 +15,5 @@ namespace BooksDataAccesLayer.Models
         [MinLength(1)]
         [MaxLength(30)]
         public string Author { get; set; }
-
-        public string Test { get; set; }
-        //public string Publisher { get; set; }
-        //public int Age { get; set; }
-        //public int Pages { get; set; }
-        //public Genre Genre { get; set; }
     }
 }

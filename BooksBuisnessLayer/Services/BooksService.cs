@@ -30,7 +30,7 @@ namespace BooksBuisnessLayer.Services
             return await _genericBooksRepository.Create(book);
         }
 
-        public async Task<Book> DeleteBookById(Guid id)
+        public async Task<bool> DeleteBookById(Guid id)
         {
             return await _genericBooksRepository.DeleteById(id);
         }
@@ -45,7 +45,7 @@ namespace BooksBuisnessLayer.Services
             return await _genericBooksRepository.GetById(id);
         }
 
-        public async Task<Book> UpdateBook(Book book)
+        public async Task<bool> UpdateBook(Book book)
         {
             return await _genericBooksRepository.Update(book);
         }

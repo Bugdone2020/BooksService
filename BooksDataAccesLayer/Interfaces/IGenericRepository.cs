@@ -12,11 +12,11 @@ namespace BooksDataAccesLayer.Interfaces
         where T : BaseEntity, new()
     {
         Task<Guid> Create(T item);
-        Task<T> DeleteById(Guid id);
+        Task<bool> DeleteById(Guid id);
         Task<IEnumerable<T>> GetAll();
         Task<T> GetById(Guid id);
         Task<T> GetByPredicate(Expression<Func<T, bool>> predicate);
-        Task<T> Update(T item);
+        Task<bool> Update(T item);
         
     }
 }
