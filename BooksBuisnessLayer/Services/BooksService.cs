@@ -5,52 +5,77 @@ using System;
 using System.Collections.Generic;
 using BooksDataAccesLayer.Interfaces;
 using AutoMapper;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace BooksBuisnessLayer.Services
 {
     public class BooksService : IBooksService
     {
+        private readonly IGenericRepository<Book> _genericBooksRepository;
         public readonly IBooksRepository _booksRepository;
         private readonly IMapper _mapper;
 
-        public BooksService(IBooksRepository booksRepository, IMapper mapper)
+        public BooksService(IGenericRepository<Book> genericBooksRepository,
+            IBooksRepository booksRepository, 
+            IMapper mapper)
         {
+            _genericBooksRepository = genericBooksRepository;
             _booksRepository = booksRepository;
             _mapper = mapper;
         }
 
-        Guid IBooksService.CreateBook(BookDTO bookDTO)
+        public async Task<Guid> CreateBook(Book book)
         {
-            Book book = _mapper.Map<Book>(bookDTO);
-
-            return _booksRepository.Create(book);
+            return await _genericBooksRepository.Create(book);
         }
 
-        Book IBooksService.DeleteBookById(Guid id)
+        public async Task<bool> DeleteBookById(Guid id)
         {
-            return _booksRepository.DeleteById(id);
+            return await _genericBooksRepository.DeleteById(id);
         }
 
-        IEnumerable<Book> IBooksService.GetAllBooks()
+        public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            return _booksRepository.GetAll();
+            return await _genericBooksRepository.GetAll();
         }
 
-        Book IBooksService.GetBookById(Guid id)
+        public async Task<Book> GetBookById(Guid id)
         {
-            return _booksRepository.GetById(id);
+            return await _genericBooksRepository.GetById(id);
         }
 
-        Book IBooksService.UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<bool> UpdateBook(Book book)
         {
-            Book book = _mapper.Map<Book>(bookDTO);
-            if (book != null)
+            return await _genericBooksRepository.Update(book);
+        }
+
+        public async Task<BookDTO> GetBookFullInfo(Guid id)
+        {
+            var result = await _booksRepository.GetFullInfo(id);
+
+            return MapTupleToBookDto(result);
+        }
+
+        private BookDTO MapTupleToBookDto((Book book, IEnumerable<BookRevision> bookRevisions) result)
+        {
+            return new BookDTO
             {
-                book.Id = id;
-                return _booksRepository.Update(book);
-            }
+                Author = result.book?.Author,
+                BookId = result.book.Id,
+                Title = result.book.Title,
+                BookRevisions = MapRevisions(result.bookRevisions)
+            };
+        }
 
-            return null;
+        private IEnumerable<BookRevisionDto> MapRevisions(IEnumerable<BookRevision> bookRevisions)
+        {
+            return bookRevisions.Select(x => new BookRevisionDto
+            {
+                Price = x.Price,
+                PagesCount = x.PagesCount,
+                YearOfPublishing = x.YearOfPublishing
+            });
         }
     }
 }

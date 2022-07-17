@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using BooksDataAccesLayer.Models;
 
 namespace BooksDataAccesLayer.Interfaces
 {
     public interface IBooksRepository
     {
-        Guid Create(Book book);
-        Book DeleteById(Guid id);
-        IEnumerable<Book> GetAll();
-        Book GetById(Guid id);
-        Book Update(Book book);
+        Task<(Book book, IEnumerable<BookRevision> bookRevisions)> GetFullInfo(Guid id);
     }
 }

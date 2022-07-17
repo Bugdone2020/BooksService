@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using BooksDataAccesLayer.Models;
 using BooksBuisnessLayer.Interfaces;
 using BooksBuisnessLayer.DTOs;
+using System.Threading.Tasks;
 
 namespace BooksPresentationLayer.Controllers
 {
@@ -23,9 +24,9 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateBook(BookDTO bookDTO)
+        public async Task<IActionResult> CreateBook(Book book)
         {
-            Guid guid = _booksService.CreateBook(bookDTO);
+            Guid guid = await _booksService.CreateBook(book);
             if (guid != Guid.Empty)
             {
                 return Ok(guid);
@@ -35,22 +36,35 @@ namespace BooksPresentationLayer.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBook(Guid id, BookDTO bookDTO)
+        public async Task<IActionResult> UpdateBook(Guid id, Book book)
         {
-            Book updatedBook = _booksService.UpdateBook(id, bookDTO);
-            
-            if (updatedBook != null)
-            {
-                return Ok(updatedBook);
-            }
+            book.Id = id;
+            var result = await _booksService.UpdateBook(book);
 
-            return BadRequest();
+            return result ? StatusCode(200) : StatusCode(400);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBookById(Guid id)
+        public async Task<IActionResult> DeleteBookById(Guid id)
         {
-            Book book = _booksService.DeleteBookById(id);
+            var result = await _booksService.DeleteBookById(id);
+
+            return result ? StatusCode(200) : StatusCode(400);
+        }
+
+        //[Authorize(Roles = Roles.Reader)]
+        [HttpGet]
+        public async Task<IActionResult> GetAllBooks()
+        {
+            IEnumerable<Book> books = await _booksService.GetAllBooks();
+            
+            return Ok(books);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookById(Guid id)
+        {
+            Book book = await _booksService.GetBookById(id);
             if (book != null)
             {
                 return Ok(book);
@@ -59,18 +73,10 @@ namespace BooksPresentationLayer.Controllers
             return NotFound();
         }
 
-        [HttpGet]
-        public IActionResult GetAllBooks()
+        [HttpGet("full/{id}")]
+        public async Task<IActionResult> GetFullBookInfoById(Guid id)
         {
-            IEnumerable<Book> books = _booksService.GetAllBooks();
-            
-            return Ok(books);
-        }
-
-        [HttpGet("{id}")]
-        public IActionResult GetBookById(Guid id)
-        {
-            Book book = _booksService.GetBookById(id);
+            BookDTO book = await _booksService.GetBookFullInfo(id);
             if (book != null)
             {
                 return Ok(book);

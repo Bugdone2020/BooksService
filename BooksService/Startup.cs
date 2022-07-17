@@ -26,10 +26,14 @@ namespace BooksPresentationLayer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IBooksRepository, BooksRepository>();
             services.AddScoped<IBooksService, BooksService>();
+            services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IClientRepository, ClientRepository>();
             services.AddDbContext<EFCoreDbContext>(options =>
-            options.UseSqlServer(Configuration["ConnectionStrings:Default"]));
+            options.UseSqlServer(Configuration["ConnectionStrings:Default"], 
+            b => b.MigrationsAssembly("BooksDataAccesLayer")));
             var assemblies = new[]
             {
                 Assembly.GetAssembly(typeof(BooksProfile))
